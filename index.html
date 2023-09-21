@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annotations</title>
+    <style>
+      .button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .comment {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+      }
+
+      .comment-text {
+        flex-grow: 1;
+      }
+
+      .delete-button {
+        background-color: #ff0000;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+
+      h1 {
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Annotations</h1>
+
+    <button class="button" onclick="openNewTab('annotations/MouseHover_annotations.html')">MouseHover</button>
+    <button class="button" onclick="openNewTab('annotations/scrollFUll_annotations.html')">scrollFUll</button>
+    <button class="button" onclick="openNewTab('annotations/scrollToElement_annotations.html')">scrollToElement</button>
+    <button class="button" onclick="openNewTab('annotations/scrollXY_annotations.html')">scrollX/scrollY</button>
+
+
+
+    <div>
+      <h2>Comments</h2>
+      <input type="text" id="commentInput" placeholder="Add a comment...">
+      <button onclick="addComment()">Add Comment</button>
+      <ul id="commentList"></ul>
+    </div>
+
+    <script>
+      function openNewTab(url) {
+        window.open(url, '_blank');
+      }
+
+      function addComment() {
+        const commentInput = document.getElementById('commentInput');
+        const commentList = document.getElementById('commentList');
+        const commentText = commentInput.value.trim();
+
+        if (commentText !== '') {
+          const listItem = document.createElement('li');
+          const deleteButton = document.createElement('button');
+          listItem.className = 'comment';
+          deleteButton.textContent = 'Delete';
+          deleteButton.className = 'delete-button';
+          listItem.innerHTML = `<span class="comment-text">${commentText}</span>`;
+          listItem.appendChild(deleteButton);
+          commentList.appendChild(listItem);
+          commentInput.value = '';
+
+          const comments = getCommentsFromLocalStorage();
+          comments.push(commentText);
+          updateCommentsInLocalStorage(comments);
+
+          deleteButton.addEventListener('click', function () {
+            listItem.remove();
+
+            const updatedComments = comments.filter(comment => comment !== commentText);
+            updateCommentsInLocalStorage(updatedComments);
+          });
+        }
+      }
+
+      window.addEventListener('load', function () {
+        const commentList = document.getElementById('commentList');
+        const comments = getCommentsFromLocalStorage();
+
+        comments.forEach(function (commentText) {
+          const listItem = document.createElement('li');
+          const deleteButton = document.createElement('button');
+          listItem.className = 'comment';
+          deleteButton.textContent = 'Delete';
+          deleteButton.className = 'delete-button';
+          listItem.innerHTML = `<span class="comment-text">${commentText}</span>`;
+          listItem.appendChild(deleteButton);
+          commentList.appendChild(listItem);
+
+          deleteButton.addEventListener('click', function () {
+            listItem.remove();
+
+            const updatedComments = comments.filter(comment => comment !== commentText);
+            updateCommentsInLocalStorage(updatedComments);
+          });
+        });
+      });
+
+      function getCommentsFromLocalStorage() {
+        return JSON.parse(localStorage.getItem('comments')) || [];
+      }
+
+      function updateCommentsInLocalStorage(comments) {
+        localStorage.setItem('comments', JSON.stringify(comments));
+      }
+    </script>
+  </body>
+
+</html>
